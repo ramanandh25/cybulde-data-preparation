@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  app:
+    user: "${USER_ID:-1000}"
+    hostname: "${HOST_NAME:-ramanand}"
+    image: cybulde-data-processing
+    container_name: cybulde-data-processing-container
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=./creds/cybulde-b0d2e22dab21.json
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      args:
+        USER_NAME: "${USER_NAME:-ramanand}"
+        USER_ID: "${USER_ID:-1000}"
+    volumes:
+      - ./:/app/
+      - ~/.config/gcloud/:/home/${USER_NAME}/.config/gcloud
+    ports:
+      - 8888:8888
+      - 8000:8000
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    ipc: host
+    init: true
